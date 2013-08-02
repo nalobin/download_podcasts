@@ -3,6 +3,7 @@
 use Modern::Perl;
 use ojo;
 use Mojo::Util;
+use Encode 'from_to';
 
 $ENV{MOJO_MAX_MESSAGE_SIZE} = 200_000_000;
 
@@ -14,6 +15,8 @@ my %podcasts = (
 );
 
 mkdir 'podcasts';
+
+my $is_windows = $^O =~ /win/i;
 
 while ( my ( $podcast, $url ) = each %podcasts ) {
     say "Get $podcast";
@@ -28,6 +31,8 @@ while ( my ( $podcast, $url ) = each %podcasts ) {
         $name =~ s/ [.]mp3 (.+) \z /.mp3/ix;
 
         $name = Mojo::Util::url_unescape( $name );
+        
+        from_to( $name, 'utf8', 'cp1251' ) if $is_windows;
 
         my $to = "podcasts/$podcast/$name";
         if ( -f $to ) {
