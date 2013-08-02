@@ -20,10 +20,11 @@ while ( my ( $podcast, $url ) = each %podcasts ) {
     mkdir "podcasts/$podcast";
 
     g( $url )->dom( 'enclosure' )->each( sub {
-        my $file = $_->attrs( 'url' );
+        my $file = $_->attr( 'url' );
 
         my $name = $file;
         $name =~ s{ .+ [/] ( [^/]+ ) \z}{$1}x;
+        $name =~ s/ [.]mp3 (.+) \z /.mp3/ix;
 
         say "Downloading $file";
 
