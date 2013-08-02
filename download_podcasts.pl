@@ -2,6 +2,7 @@
 
 use Modern::Perl;
 use ojo;
+use Mojo::Util;
 
 $ENV{MOJO_MAX_MESSAGE_SIZE} = 200_000_000;
 
@@ -26,8 +27,16 @@ while ( my ( $podcast, $url ) = each %podcasts ) {
         $name =~ s{ .+ [/] ( [^/]+ ) \z}{$1}x;
         $name =~ s/ [.]mp3 (.+) \z /.mp3/ix;
 
-        say "Downloading $file";
+        $name = Mojo::Util::url_unescape( $name );
 
-        g( $file )->content->asset->move_to( "podcasts/$podcast/$name" );
+        my $to = "podcasts/$podcast/$name";
+        if ( -f $to ) {
+            say "Skipping $to";
+            return;
+        }
+
+        say "Downloading $name";
+
+        g( $file )->content->asset->move_to( $to );
     } );
 }
