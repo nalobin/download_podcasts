@@ -4,6 +4,12 @@ use Modern::Perl;
 use ojo;
 use Mojo::Util;
 use Encode 'from_to';
+use Getopt::Long;
+use DateTime::Format::RSS;
+use Number::Bytes::Human 'format_bytes';
+
+my $date_from;
+my $date_to  ;
 
 $ENV{MOJO_MAX_MESSAGE_SIZE} = 200_000_000;
 
@@ -14,17 +20,41 @@ my %podcasts = (
     makeitsexy => 'http://makeitsexy.rpod.ru/rss.xml',
 );
 
+GetOptions(
+    'from=s' => \$date_from,
+    'to=s'   => \$date_to  ,
+) or die "Error in command line arguments\n";
+
+for ( $date_from, $date_to ) {
+    next  unless defined;
+
+    die "Date should be in YYYY-MM-DD format\n"  unless /^\d{4}-\d{2}-\d{2}$/;
+}
+
 mkdir 'podcasts';
 
 my $is_windows = $^O =~ /win/i;
+
+my $rss_date = DateTime::Format::RSS->new;
 
 while ( my ( $podcast, $url ) = each %podcasts ) {
     say "Get $podcast";
 
     mkdir "podcasts/$podcast";
 
-    g( $url )->dom( 'enclosure' )->each( sub {
-        my $file = $_->attr( 'url' );
+    g( $url )->dom( 'item' )->each( sub {
+        if ( my $pub_date = $_->find( 'pubDate' )->[0]->text ) {
+            # Sat, 15 Feb 2014 14:13:00 PST
+            ( $pub_date ) = split /T/, $rss_date->format_datetime( $rss_date->parse_datetime( $pub_date ) );
+
+            return  if $date_from && $date_from gt $pub_date;  
+            return  if $date_to   && $date_to   lt $pub_date;  
+        }
+
+        my $enclosure = $_->find( 'enclosure' )->[0];
+
+        my $file = $enclosure->attr( 'url'    );
+        my $size = $enclosure->attr( 'length' );
 
         my $name = $file;
         $name =~ s{ .+ [/] ( [^/]+ ) \z}{$1}x;
@@ -40,7 +70,7 @@ while ( my ( $podcast, $url ) = each %podcasts ) {
             return;
         }
 
-        say "Downloading $name";
+        say "Downloading $name", $size ? ' ' . format_bytes( $size, base => 1000 ) : '';
 
         g( $file )->content->asset->move_to( $to );
     } );
