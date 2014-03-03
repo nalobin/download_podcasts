@@ -18,6 +18,10 @@ my %podcasts = (
     radio_t    => 'http://feeds.rucast.net/radio-t',
     it_compot  => 'http://hack.podfm.ru/it_compot/rss/rss.xml',
     makeitsexy => 'http://makeitsexy.rpod.ru/rss.xml',
+    radioma    => 'http://radioma.org/feed',
+    razbor     => 'http://feeds.feedburner.com/razbor-podcast',
+    pop        => 'http://b0noi.podfm.ru/PoP/rss/rss.xml',
+    it_career  => 'http://it-career.podfm.ru/rss/rss.xml',
 );
 
 GetOptions(
@@ -31,6 +35,8 @@ for ( $date_from, $date_to ) {
     die "Date should be in YYYY-MM-DD format\n"  unless /^\d{4}-\d{2}-\d{2}$/;
 }
 
+my @only = @ARGV;
+
 mkdir 'podcasts';
 
 my $is_windows = $^O =~ /win/i;
@@ -38,6 +44,8 @@ my $is_windows = $^O =~ /win/i;
 my $rss_date = DateTime::Format::RSS->new;
 
 while ( my ( $podcast, $url ) = each %podcasts ) {
+    next  if @only && !grep { $podcast eq $_ } @only;
+
     say "Get $podcast";
 
     mkdir "podcasts/$podcast";
