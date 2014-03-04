@@ -59,7 +59,7 @@ while ( my ( $podcast, $url ) = each %podcasts ) {
             return  if $date_to   && $date_to   lt $pub_date;  
         }
 
-        my $enclosure = $_->find( 'enclosure' )->[0];
+        my $enclosure = $_->find( 'enclosure' )->[0] or return;
 
         my $file = $enclosure->attr( 'url'    );
         my $size = $enclosure->attr( 'length' );
