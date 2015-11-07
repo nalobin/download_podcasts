@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 use Modern::Perl;
 use ojo;
@@ -22,6 +22,7 @@ my %podcasts = (
     razbor     => 'http://feeds.feedburner.com/razbor-podcast',
     pop        => 'http://b0noi.podfm.ru/PoP/rss/rss.xml',
     it_career  => 'http://it-career.podfm.ru/rss/rss.xml',
+    devzen     => 'http://devzen.ru/feed/',
 );
 
 GetOptions(
