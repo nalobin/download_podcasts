@@ -50,7 +50,8 @@ while ( my ( $podcast, $url ) = each %podcasts ) {
     say "Get $podcast";
 
     g( $url )->dom( 'item' )->each( sub {
-        if ( my $pub_date = $_->find( 'pubDate' )->[0]->text ) {
+        my $pub_date;
+        if ( $pub_date = $_->find( 'pubDate' )->[0]->text ) {
             # Sat, 15 Feb 2014 14:13:00 PST
             ( $pub_date ) = split /T/, $rss_date->format_datetime( $rss_date->parse_datetime( $pub_date ) );
 
@@ -73,13 +74,13 @@ while ( my ( $podcast, $url ) = each %podcasts ) {
 
 	mkdir "podcasts/$podcast";
 
-        my $to = "podcasts/$podcast/$pub_date_$name";
+        my $to = "podcasts/$podcast/${pub_date}_$name";
         if ( -f $to ) {
             say "Skipping $to";
             return;
         }
 
-        say "Downloading $name", $size ? ' ' . format_bytes( $size, base => 1000 ) : '';
+        say "Downloading $name, $pub_date", $size ? ' ' . format_bytes( $size, base => 1000 ) : '';
 
         g( $file )->content->asset->move_to( $to );
     } );
