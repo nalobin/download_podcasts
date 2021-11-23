@@ -49,8 +49,6 @@ while ( my ( $podcast, $url ) = each %podcasts ) {
 
     say "Get $podcast";
 
-    mkdir "podcasts/$podcast";
-
     g( $url )->dom( 'item' )->each( sub {
         if ( my $pub_date = $_->find( 'pubDate' )->[0]->text ) {
             # Sat, 15 Feb 2014 14:13:00 PST
@@ -72,6 +70,8 @@ while ( my ( $podcast, $url ) = each %podcasts ) {
         $name = Mojo::Util::url_unescape( $name );
         
         from_to( $name, 'utf8', 'cp1251' ) if $is_windows;
+
+	mkdir "podcasts/$podcast";
 
         my $to = "podcasts/$podcast/$name";
         if ( -f $to ) {
