@@ -73,7 +73,7 @@ while ( my ( $podcast, $url ) = each %podcasts ) {
 
 	mkdir "podcasts/$podcast";
 
-        my $to = "podcasts/$podcast/$name";
+        my $to = "podcasts/$podcast/$pub_date_$name";
         if ( -f $to ) {
             say "Skipping $to";
             return;
