@@ -11,7 +11,7 @@ use Number::Bytes::Human 'format_bytes';
 my $date_from;
 my $date_to  ;
 
-$ENV{MOJO_MAX_MESSAGE_SIZE} = 200_000_000;
+$ENV{MOJO_MAX_MESSAGE_SIZE} = 500_000_000;
 
 my %podcasts = (
     the_art    => 'http://taop.rpod.ru/rss.xml',
